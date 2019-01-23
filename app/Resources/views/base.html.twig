@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}{{ brand }}{% endblock %}</title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% include 'layout/navbar.html.twig' %}
+
+        <div class="container">
+            {% block body %}
+            {% endblock %}
+        </div>
+
+        {% block javascripts %}
+            <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+            <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        {% endblock %}
+    </body>
+</html>

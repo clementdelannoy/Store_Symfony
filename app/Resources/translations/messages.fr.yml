@@ -1,0 +1,25 @@
+navbar:
+  home: Accueil
+  store: Boutique
+  category:
+    add: Ajouter une catégorie
+    list: Liste des catégories
+  product:
+    add: Ajouter un produit
+    list: Liste des produits
+
+list:
+  category:
+    title: Liste des catégories
+    name: Nom
+    active: Active
+    actions: Actions
+  product:
+    title: Liste des produits
+    name: Nom
+    price: Prix
+    description: Description
+    created_at: Date création
+    updated_at: Date mise à jour
+    active: Active
+    actions: Actions
