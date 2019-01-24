@@ -70,8 +70,10 @@ class ProjectServiceContainer extends Container
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
             'decorator_service.inner' => true,
+            'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
+            'tagged_iterator_foo' => true,
         );
     }
 
@@ -87,7 +89,7 @@ class ProjectServiceContainer extends Container
 
     public function isFrozen()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
     }
@@ -262,7 +264,6 @@ class ProjectServiceContainer extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a = new \Bar();
-
         $a->pub = 'pub';
         $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->getBazService()) && false ?: '_'});
 
@@ -307,7 +308,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getMethodCall1Service()
     {
-        require_once '%path%foo.php';
+        include_once '%path%foo.php';
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
@@ -354,7 +355,7 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
             yield 0 => ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
-            yield 1 => ${($_ = isset($this->services['tagged_iterator_foo']) ? $this->services['tagged_iterator_foo'] : $this->services['tagged_iterator_foo'] = new \Bar()) && false ?: '_'};
+            yield 1 => ${($_ = isset($this->services['tagged_iterator_foo']) ? $this->services['tagged_iterator_foo'] : ($this->services['tagged_iterator_foo'] = new \Bar())) && false ?: '_'};
         }, 2));
     }
 
@@ -384,6 +385,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameter($name)
     {
+        $name = (string) $name;
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             $name = $this->normalizeParameterName($name);
 
@@ -400,6 +402,7 @@ class ProjectServiceContainer extends Container
 
     public function hasParameter($name)
     {
+        $name = (string) $name;
         $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
@@ -429,7 +432,7 @@ class ProjectServiceContainer extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -447,7 +450,7 @@ class ProjectServiceContainer extends Container
         if (isset($this->normalizedParameterNames[$normalizedName = strtolower($name)]) || isset($this->parameters[$normalizedName]) || array_key_exists($normalizedName, $this->parameters)) {
             $normalizedName = isset($this->normalizedParameterNames[$normalizedName]) ? $this->normalizedParameterNames[$normalizedName] : $normalizedName;
             if ((string) $name !== $normalizedName) {
-                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since Symfony 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
             }
         } else {
             $normalizedName = $this->normalizedParameterNames[$normalizedName] = (string) $name;

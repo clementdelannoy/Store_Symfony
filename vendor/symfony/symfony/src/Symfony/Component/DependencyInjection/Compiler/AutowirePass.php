@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -29,7 +30,7 @@ class AutowirePass extends AbstractRecursivePass
 {
     private $definedTypes = array();
     private $types;
-    private $ambiguousServiceTypes = array();
+    private $ambiguousServiceTypes;
     private $autowired = array();
     private $lastFailure;
     private $throwOnAutowiringException;
@@ -70,7 +71,7 @@ class AutowirePass extends AbstractRecursivePass
         } finally {
             $this->definedTypes = array();
             $this->types = null;
-            $this->ambiguousServiceTypes = array();
+            $this->ambiguousServiceTypes = null;
             $this->autowired = array();
         }
     }
@@ -86,7 +87,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     public static function createResourceForClass(\ReflectionClass $reflectionClass)
     {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.'() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
 
         $metadata = array();
 
@@ -232,7 +233,10 @@ class AutowirePass extends AbstractRecursivePass
                     if ($parameter->isOptional()) {
                         continue;
                     }
-                    throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+                    $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, false);
+                    $type = $type ? sprintf('is type-hinted "%s"', $type) : 'has no type-hint';
+
+                    throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" %s, you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type));
                 }
 
                 // specifically pass the default value
@@ -280,12 +284,12 @@ class AutowirePass extends AbstractRecursivePass
         $this->lastFailure = null;
         $type = $reference->getType();
 
-        if ($type !== (string) $reference || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
+        if ($type !== $this->container->normalizeId($reference) || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
             return $reference;
         }
 
         if (null === $this->types) {
-            $this->populateAvailableTypes();
+            $this->populateAvailableTypes($this->strictMode);
         }
 
         if (isset($this->definedTypes[$type])) {
@@ -321,12 +325,15 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types.
      */
-    private function populateAvailableTypes()
+    private function populateAvailableTypes($onlyAutowiringTypes = false)
     {
         $this->types = array();
+        if (!$onlyAutowiringTypes) {
+            $this->ambiguousServiceTypes = array();
+        }
 
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            $this->populateAvailableType($id, $definition);
+            $this->populateAvailableType($id, $definition, $onlyAutowiringTypes);
         }
     }
 
@@ -336,7 +343,7 @@ class AutowirePass extends AbstractRecursivePass
      * @param string     $id
      * @param Definition $definition
      */
-    private function populateAvailableType($id, Definition $definition)
+    private function populateAvailableType($id, Definition $definition, $onlyAutowiringTypes)
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -347,6 +354,10 @@ class AutowirePass extends AbstractRecursivePass
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
             unset($this->ambiguousServiceTypes[$type]);
+        }
+
+        if ($onlyAutowiringTypes) {
+            return;
         }
 
         if (preg_match('/^\d+_[^~]++~[._a-zA-Z\d]{7}$/', $id) || $definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
@@ -432,7 +443,7 @@ class AutowirePass extends AbstractRecursivePass
             $this->currentId = $currentId;
         }
 
-        @trigger_error(sprintf('Relying on service auto-registration for type "%s" is deprecated since version 3.4 and won\'t be supported in 4.0. Create a service named "%s" instead.', $type, $type), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Relying on service auto-registration for type "%s" is deprecated since Symfony 3.4 and won\'t be supported in 4.0. Create a service named "%s" instead.', $type, $type), E_USER_DEPRECATED);
 
         $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $type, $this->currentId));
 
@@ -441,11 +452,35 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
-        if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
-            $message = sprintf('has type "%s" but this class cannot be loaded.', $type);
+        $trackResources = $this->container->isTrackingResources();
+        $this->container->setResourceTracking(false);
+        try {
+            if ($r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
+                $alternatives = $this->createTypeAlternatives($reference);
+            }
+        } finally {
+            $this->container->setResourceTracking($trackResources);
+        }
+
+        if (!$r) {
+            // either $type does not exist or a parent class does not exist
+            try {
+                $resource = new ClassExistenceResource($type, false);
+                // isFresh() will explode ONLY if a parent class/trait does not exist
+                $resource->isFresh(0);
+                $parentMsg = false;
+            } catch (\ReflectionException $e) {
+                $parentMsg = $e->getMessage();
+            }
+
+            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
-            $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));
+            $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $alternatives);
+
+            if ($r->isInterface() && !$alternatives) {
+                $message .= ' Did you create a class that implements this interface?';
+            }
         }
 
         $message = sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
@@ -464,12 +499,15 @@ class AutowirePass extends AbstractRecursivePass
         if ($message = $this->getAliasesSuggestionForType($type = $reference->getType())) {
             return ' '.$message;
         }
+        if (null === $this->ambiguousServiceTypes) {
+            $this->populateAvailableTypes();
+        }
 
         if (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
-        } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered()) {
+        } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered() && !$this->strictMode) {
             return ' It cannot be auto-registered because it is from a different root namespace.';
         } else {
             return;
@@ -513,7 +551,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $extraContext = $extraContext ? ' '.$extraContext : '';
-        if (1 < $len = count($aliases)) {
+        if (1 < $len = \count($aliases)) {
             $message = sprintf('Try changing the type-hint%s to one of its parents: ', $extraContext);
             for ($i = 0, --$len; $i < $len; ++$i) {
                 $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);

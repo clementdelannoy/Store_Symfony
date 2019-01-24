@@ -20,6 +20,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as SecurityExpressionLanguage;
+use Zend\Diactoros\ServerRequestFactory;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -33,15 +34,18 @@ class SensioFrameworkExtraExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
-        $annotationsToLoad = array();
+        $annotationsToLoad = [];
+        $definitionsToRemove = [];
 
         if ($config['router']['annotations']) {
+            @trigger_error(sprintf('Enabling the "sensio_framework_extra.router.annotations" configuration is deprecated since version 5.2. Set it to false and use the "%s" annotation from Symfony itself.', \Symfony\Component\Routing\Annotation\Route::class), E_USER_DEPRECATED);
+
             $annotationsToLoad[] = 'routing.xml';
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\ControllerListener',
-                ));
+                ]);
             }
         }
 
@@ -51,17 +55,17 @@ class SensioFrameworkExtraExtension extends Extension
             $container->registerForAutoconfiguration(ParamConverterInterface::class)
                 ->addTag('request.param_converter');
 
-            $container->setParameter('sensio_framework_extra.disabled_converters', is_string($config['request']['disable']) ? implode(',', $config['request']['disable']) : $config['request']['disable']);
+            $container->setParameter('sensio_framework_extra.disabled_converters', \is_string($config['request']['disable']) ? implode(',', $config['request']['disable']) : $config['request']['disable']);
 
             $container->addResource(new ClassExistenceResource(ExpressionLanguage::class));
             if (class_exists(ExpressionLanguage::class)) {
                 $container->setAlias('sensio_framework_extra.converter.doctrine.orm.expression_language', new Alias('sensio_framework_extra.converter.doctrine.orm.expression_language.default', false));
             } else {
-                $container->removeDefinition('sensio_framework_extra.converter.doctrine.orm.expression_language.default');
+                $definitionsToRemove[] = 'sensio_framework_extra.converter.doctrine.orm.expression_language.default';
             }
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     // cannot be added because it has some annotations
                     //'Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\ParamConverter',
                     'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\ParamConverterListener',
@@ -69,27 +73,27 @@ class SensioFrameworkExtraExtension extends Extension
                     'Sensio\\Bundle\\FrameworkExtraBundle\\Request\\ParamConverter\\DoctrineParamConverter',
                     'Sensio\\Bundle\\FrameworkExtraBundle\\Request\\ParamConverter\\ParamConverterInterface',
                     'Sensio\\Bundle\\FrameworkExtraBundle\\Request\\ParamConverter\\ParamConverterManager',
-                ));
+                ]);
             }
         }
 
         if ($config['view']['annotations']) {
             $annotationsToLoad[] = 'view.xml';
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\TemplateListener',
-                ));
+                ]);
             }
         }
 
         if ($config['cache']['annotations']) {
             $annotationsToLoad[] = 'cache.xml';
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\HttpCacheListener',
-                ));
+                ]);
             }
         }
 
@@ -103,16 +107,16 @@ class SensioFrameworkExtraExtension extends Extension
                 if (class_exists(SecurityExpressionLanguage::class)) {
                     $container->setAlias('sensio_framework_extra.security.expression_language', new Alias($config['security']['expression_language'], false));
                 } else {
-                    $container->removeDefinition('sensio_framework_extra.security.expression_language.default');
+                    $definitionsToRemove[] = 'sensio_framework_extra.security.expression_language.default';
                 }
             } else {
-                $container->removeDefinition('sensio_framework_extra.security.expression_language.default');
+                $definitionsToRemove[] = 'sensio_framework_extra.security.expression_language.default';
             }
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\SecurityListener',
-                ));
+                ]);
             }
         }
 
@@ -124,10 +128,10 @@ class SensioFrameworkExtraExtension extends Extension
                 $loader->load($configFile);
             }
 
-            if (PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+            if (\PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile([
                     'Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\ConfigurationAnnotation',
-                ));
+                ]);
             }
 
             if ($config['request']['converters']) {
@@ -143,6 +147,14 @@ class SensioFrameworkExtraExtension extends Extension
 
         if ($config['psr_message']['enabled']) {
             $loader->load('psr7.xml');
+
+            if (!class_exists(ServerRequestFactory::class)) {
+                $definitionsToRemove[] = 'sensio_framework_extra.psr7.argument_value_resolver.server_request';
+            }
+        }
+
+        foreach ($definitionsToRemove as $definition) {
+            $container->removeDefinition($definition);
         }
     }
 

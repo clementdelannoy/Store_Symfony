@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Tests;
+namespace Symfony\Bundle\SecurityBundle\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
@@ -60,6 +60,6 @@ class TraceableFirewallListenerTest extends TestCase
         $this->assertCount(1, $listeners);
         $this->assertSame($response, $listeners[0]['response']);
         $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
-        $this->assertSame(get_class($listener), (string) $listeners[0]['stub']);
+        $this->assertSame(\get_class($listener), (string) $listeners[0]['stub']);
     }
 }

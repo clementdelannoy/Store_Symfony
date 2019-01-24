@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+5.2
+---
+
+ * Deprecated routing annotations as this is included in symfony/framework-bundle.
+   Disable the feature with
+
+   ```
+   sensio_framework_extra:
+       router:
+           annotations: false
+   ```
+
+   Also replace the annotations `Sensio\Bundle\FrameworkExtraBundle\Configuration\Route`
+   and `Sensio\Bundle\FrameworkExtraBundle\Configuration\Method` with `Symfony\Component\Routing\Annotation\Route`
+
 5.1
 ---
 
@@ -24,7 +39,7 @@ CHANGELOG
  * added @IsGranted() annotation
  * allowed to disable some converters
  * allowed to customize the @security message and status code
- * changed template name generation from camelCase to under_score
+ * [BC BREAK] changed template name generation from camelCase to under_score for both files and directories
  * removed support for bundle inheritance
  * a RuntimeException is now thrown when a reserved variable is used in a security expression
  * added cache-control max-stale support

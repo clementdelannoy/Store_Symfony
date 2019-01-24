@@ -1,23 +1,23 @@
-{% extends "base.html.twig" %}
-{% block body %}
+{% extends 'base.html.twig' %}
 
+{% block body %}
     <h1>Nouvelle catégorie</h1>
 
-    {{ form_start(form, {'attr' : {novalidate: 'novalidate'} }) }}
+    {{ form_start(form, { attr: { 'novalidate': true } }) }}
 
     <div class="form-group">
         {{ form_label(form.name) }}
-        {{ form_widget(form.name, { attr: { class: 'form-control'} }) }}
+        {{ form_widget(form.name, { attr: { class: 'form-control' } }) }}
         {{ form_errors(form.name) }}
     </div>
 
     <div class="form-check">
-        {{ form_widget(form.active, { attr: { class: 'form-check-input'} }) }}
-        {{ form_label(form.active, null, { attr: { class: 'form-check-label'} }) }}
+        {{ form_widget(form.active, { attr: { class: 'form-check-input' } } ) }}
+        {{ form_label(form.active, null, { attr: { class: 'form-check-label' } } ) }}
         {{ form_errors(form.active) }}
     </div>
 
-    {{ form_widget(form.submit, { attr: { class: 'btn btn-success'} }) }}
+    {{ form_widget(form.submit, { attr: { class: 'btn btn-success mt-3' } } ) }}
 
     {{ form_end(form) }}
 

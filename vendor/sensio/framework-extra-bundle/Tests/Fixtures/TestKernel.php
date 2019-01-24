@@ -21,22 +21,23 @@ class TestKernel extends Kernel
 {
     public function registerBundles()
     {
-        return array(
+        return [
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new \Symfony\Bundle\MonologBundle\MonologBundle(),
             new \Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new \Tests\Fixtures\FooBundle\FooBundle(),
             new \Tests\Fixtures\ActionArgumentsBundle\ActionArgumentsBundle(),
-        );
+        ];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__.'/config/config.yml');
 
-        if (PHP_VERSION_ID >= 70100) {
+        if (\PHP_VERSION_ID >= 70100) {
             $loader->load(__DIR__.'/config/nullable_type/config.yml');
         }
     }

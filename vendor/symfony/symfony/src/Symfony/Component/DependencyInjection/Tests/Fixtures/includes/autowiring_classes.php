@@ -90,6 +90,13 @@ class J
     }
 }
 
+class K
+{
+    public function __construct(IInterface $i)
+    {
+    }
+}
+
 interface CollisionInterface
 {
 }
@@ -174,7 +181,7 @@ class NotGuessableArgumentForSubclass
 }
 class MultipleArguments
 {
-    public function __construct(A $k, $foo, Dunglas $dunglas)
+    public function __construct(A $k, $foo, Dunglas $dunglas, array $bar)
     {
     }
 }

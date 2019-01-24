@@ -12,11 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
@@ -38,7 +38,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testRolesHierarchyWithAcl()
     {
@@ -58,12 +58,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $expectedProviders = array(
             'security.user.provider.concrete.default',
-            'security.user.provider.concrete.default_foo',
             'security.user.provider.concrete.digest',
-            'security.user.provider.concrete.digest_foo',
             'security.user.provider.concrete.basic',
-            'security.user.provider.concrete.basic_foo',
-            'security.user.provider.concrete.basic_bar',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -89,7 +85,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments['index_0']->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_2']);
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -117,7 +113,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 null,
                 null,
                 array(
-                    'logout',
                     'switch_user',
                     'x509',
                     'remote_user',
@@ -166,13 +161,29 @@ abstract class CompleteConfigurationTest extends TestCase
                 ),
                 null,
             ),
+            array(
+                'simple_auth',
+                'security.user_checker',
+                null,
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'simple_auth',
+                'security.authentication.form_entry_point.simple_auth',
+                null,
+                null,
+                array(
+                    'simple_form',
+                    'anonymous',
+                ),
+                null,
+            ),
         ), $configs);
 
         $this->assertEquals(array(
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
@@ -196,6 +207,13 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.anonymous.with_user_checker',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.2',
+                'security.authentication.listener.simple_form.simple_auth',
+                'security.authentication.listener.anonymous.simple_auth',
+                'security.access_listener',
+            ),
         ), $listeners);
 
         $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
@@ -215,7 +233,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments['index_0']->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_2']);
+            $configDef = $container->getDefinition((string) $arguments['index_3']);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -243,7 +261,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 null,
                 null,
                 array(
-                    'logout',
                     'switch_user',
                     'x509',
                     'remote_user',
@@ -299,7 +316,6 @@ abstract class CompleteConfigurationTest extends TestCase
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
@@ -378,10 +394,10 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
-            $i = count($matcherIds);
+            $i = \count($matcherIds);
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);
@@ -467,7 +483,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testAcl()
     {
@@ -479,7 +495,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testCustomAclProvider()
     {
@@ -539,11 +555,22 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "strategy" and "service" cannot be used together.
+     * @expectedExceptionMessage Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.
      */
     public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
     {
-        $container = $this->getContainer('access_decision_manager_service_and_strategy');
+        $this->getContainer('access_decision_manager_service_and_strategy');
+    }
+
+    public function testAccessDecisionManagerOptionsAreNotOverriddenByImplicitStrategy()
+    {
+        $container = $this->getContainer('access_decision_manager_customized_config');
+
+        $accessDecisionManagerDefinition = $container->getDefinition('security.access.decision_manager');
+
+        $this->assertSame(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $accessDecisionManagerDefinition->getArgument(1));
+        $this->assertTrue($accessDecisionManagerDefinition->getArgument(2));
+        $this->assertFalse($accessDecisionManagerDefinition->getArgument(3));
     }
 
     /**
@@ -578,7 +605,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     protected function getContainer($file)
     {
-        $file = $file.'.'.$this->getFileExtension();
+        $file .= '.'.$this->getFileExtension();
 
         $container = new ContainerBuilder();
         $security = new SecurityExtension();

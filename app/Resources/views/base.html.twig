@@ -2,10 +2,9 @@
 <html lang="{{ locale }}">
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}{{ brand }}{% endblock %}</title>
+        <title>{% block title %}Aston {% endblock %}</title>
         {% block stylesheets %}
-            <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
-            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+            <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
@@ -13,8 +12,19 @@
         {% include 'layout/navbar.html.twig' %}
 
         <div class="container">
-            {% block body %}
-            {% endblock %}
+
+            {% for type,messages in app.session.flashbag.all %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
         </div>
 
         {% block javascripts %}

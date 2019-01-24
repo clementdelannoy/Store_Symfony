@@ -2,10 +2,8 @@
 
 namespace CartBundle\Forms\Type;
 
-use CartBundle\Entity\Category;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,9 +18,11 @@ class ProductType extends AbstractType
     {
         $builder->add('name', TextType::class)
                 ->add('description', TextareaType::class)
-                ->add('price', TextType::class)
                 ->add('categories')
-                ->add('active', CheckboxType::class, ['required' => false])
+                ->add('price', TextType::class)
+                ->add('active', CheckboxType::class, [
+                    'required' => false,
+                ])
                 ->add('submit', SubmitType::class);
     }
 }

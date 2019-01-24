@@ -55,7 +55,6 @@ class ProductHandler
     public function onSave()
     {
         return $this->handle($this->createForm(new Product()));
-
     }
 
     public function getView()
@@ -69,17 +68,20 @@ class ProductHandler
         $repo = $this->em->getRepository(Product::class);
         $product = $repo->find($id);
 
-        if(!$product){
-            throw new NotFoundHttpException('Produit introuvable');
+        if (!$product) {
+            throw new NotFoundHttpException('Product not found');
         }
 
         return $this->handle($this->createForm($product));
     }
 
+    /**
+     * @param Form $form
+     * @return bool
+     */
     protected function handle(Form $form)
     {
         $form->handleRequest($this->request);
-
         $this->view = $form->createView();
 
         if ($this->request->isMethod('POST') && $form->isSubmitted()) {

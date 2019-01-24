@@ -11,9 +11,9 @@
 
 namespace Tests\Fixtures\FooBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Template("@Foo/invokable/predefined.html.twig")
@@ -25,9 +25,9 @@ class MultipleActionsClassLevelTemplateController extends Controller
      */
     public function firstAction()
     {
-        return array(
+        return [
             'foo' => 'bar',
-        );
+        ];
     }
 
     /**
@@ -36,9 +36,9 @@ class MultipleActionsClassLevelTemplateController extends Controller
      */
     public function secondAction()
     {
-        return array(
+        return [
             'foo' => 'bar',
-        );
+        ];
     }
 
     /**
@@ -47,8 +47,8 @@ class MultipleActionsClassLevelTemplateController extends Controller
      */
     public function overwriteAction()
     {
-        return array(
+        return [
             'foo' => 'foo bar baz',
-        );
+        ];
     }
 }

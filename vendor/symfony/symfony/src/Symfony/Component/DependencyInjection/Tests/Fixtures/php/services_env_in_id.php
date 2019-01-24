@@ -44,6 +44,7 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'bar_%env(BAR)%' => true,
             'baz_%env(BAR)%' => true,
         );
     }
@@ -60,7 +61,7 @@ class ProjectServiceContainer extends Container
 
     public function isFrozen()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
     }
@@ -72,7 +73,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : $this->services['bar_%env(BAR)%'] = new \stdClass()) && false ?: '_'});
+        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'});
     }
 
     /**
@@ -82,7 +83,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : $this->services['bar_%env(BAR)%'] = new \stdClass()) && false ?: '_'}, array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
+        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'}, array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
     }
 
     /**
@@ -97,6 +98,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameter($name)
     {
+        $name = (string) $name;
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             $name = $this->normalizeParameterName($name);
 
@@ -113,6 +115,7 @@ class ProjectServiceContainer extends Container
 
     public function hasParameter($name)
     {
+        $name = (string) $name;
         $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
@@ -142,7 +145,7 @@ class ProjectServiceContainer extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -162,7 +165,7 @@ class ProjectServiceContainer extends Container
         if (isset($this->normalizedParameterNames[$normalizedName = strtolower($name)]) || isset($this->parameters[$normalizedName]) || array_key_exists($normalizedName, $this->parameters)) {
             $normalizedName = isset($this->normalizedParameterNames[$normalizedName]) ? $this->normalizedParameterNames[$normalizedName] : $normalizedName;
             if ((string) $name !== $normalizedName) {
-                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since Symfony 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
             }
         } else {
             $normalizedName = $this->normalizedParameterNames[$normalizedName] = (string) $name;

@@ -12,10 +12,10 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
@@ -147,6 +147,47 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderStart($form->createView());
 
         $this->assertSame('<form name="form" method="get" action="0">', $html);
+    }
+
+    public function isRootFormProvider()
+    {
+        return array(
+            array(true, new FormView()),
+            array(false, new FormView(new FormView())),
+        );
+    }
+
+    /**
+     * @dataProvider isRootFormProvider
+     */
+    public function testIsRootForm($expected, FormView $formView)
+    {
+        $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
+    }
+
+    public function testMoneyWidgetInIso()
+    {
+        $environment = new Environment(new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        )), array('strict_variables' => true));
+        $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addExtension(new FormExtension());
+        $environment->setCharset('ISO-8859-1');
+
+        $rendererEngine = new TwigRendererEngine(array(
+            'form_div_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
+
+        $view = $this->factory
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType')
+            ->createView()
+        ;
+
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
     }
 
     protected function renderForm(FormView $view, array $vars = array())

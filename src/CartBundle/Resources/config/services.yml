@@ -6,6 +6,6 @@ services:
   cart.product.handler:
     class: CartBundle\Forms\Handler\ProductHandler
     arguments:
-    - "@doctrine.orm.entity_manager"
-    - "@form.factory"
-    - "@request_stack"
+      - "@doctrine.orm.entity_manager"
+      - "@form.factory"
+      - "@request_stack"

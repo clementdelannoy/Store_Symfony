@@ -69,7 +69,7 @@ EOT
             new TableSeparator(),
             array('<info>Kernel</>'),
             new TableSeparator(),
-            array('Type', get_class($kernel)),
+            array('Type', \get_class($kernel)),
             array('Name', $kernel->getName()),
             array('Environment', $kernel->getEnvironment()),
             array('Debug', $kernel->isDebug() ? 'true' : 'false'),
@@ -84,12 +84,12 @@ EOT
             array('Architecture', (PHP_INT_SIZE * 8).' bits'),
             array('Intl locale', class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'),
             array('Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'),
-            array('OPcache', extension_loaded('Zend OPcache') && ini_get('opcache.enable') ? 'true' : 'false'),
-            array('APCu', extension_loaded('apcu') && ini_get('apc.enabled') ? 'true' : 'false'),
-            array('Xdebug', extension_loaded('xdebug') ? 'true' : 'false'),
+            array('OPcache', \extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'),
+            array('APCu', \extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'),
+            array('Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'),
         );
 
-        if ($dotenv = self::getDotEnvVars()) {
+        if ($dotenv = self::getDotenvVars()) {
             $rows = array_merge($rows, array(
                 new TableSeparator(),
                 array('<info>Environment (.env)</>'),
@@ -128,7 +128,7 @@ EOT
         return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
     }
 
-    private static function getDotEnvVars()
+    private static function getDotenvVars()
     {
         $vars = array();
         foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {

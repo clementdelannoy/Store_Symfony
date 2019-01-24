@@ -2,7 +2,6 @@
 parameters:
     app_brand: Aston
     app_locale: fr
-
     database_host: 127.0.0.1
     database_port: 8889
     database_name: aston_sf3

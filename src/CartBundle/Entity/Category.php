@@ -2,9 +2,9 @@
 
 namespace CartBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\ORM\Mapping\ManyToMany;
 
 /**
  * Category
@@ -27,11 +27,11 @@ class Category
      * @var string
      *
      * @Assert\NotBlank()
-     * @Assert\Length(min=3)
+     * @Assert\Length(min=3, max=255)
      *
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
-    private $name;
+    private $name = '';
 
     /**
      * @var bool
@@ -40,18 +40,24 @@ class Category
      *
      * @ORM\Column(name="active", type="boolean")
      */
-    private $active;
+    private $active = false;
 
     /**
-     * Many Categories have Many Products.
-     * @ManyToMany(targetEntity="Product", mappedBy="product")
+     * Many Groups have Many Users.
+     *
+     * @ORM\ManyToMany(targetEntity="CartBundle\Entity\Product", mappedBy="categories")
      */
     private $products;
 
-    public function __construct() {
-        $this->products = new \Doctrine\Common\Collections\ArrayCollection();
+    /**
+     * Category constructor.
+     */
+    public function __construct()
+    {
+        $this->setName('');
+        $this->setActive(true);
+        $this->setProducts(new ArrayCollection());
     }
-
 
     /**
      * Get id
@@ -112,7 +118,18 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @param ArrayCollection $products
+     * @return $this
+     */
+    public function setProducts(ArrayCollection $products)
+    {
+        $this->products = $products;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
      */
     public function getProducts()
     {
@@ -120,17 +137,11 @@ class Category
     }
 
     /**
-     * @param mixed $products
+     * @return string
      */
-    public function setProducts($products)
-    {
-        $this->products = $products;
-    }
-
     public function __toString()
     {
         return $this->name;
     }
-
 }
 

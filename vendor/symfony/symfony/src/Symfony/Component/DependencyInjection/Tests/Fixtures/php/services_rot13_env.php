@@ -55,7 +55,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
     public function isFrozen()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
     }
@@ -78,12 +78,13 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     protected function getContainer_EnvVarProcessorsLocatorService()
     {
         return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('rot13' => function () {
-            return ${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] : $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor()) && false ?: '_'};
+            return ${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] : ($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor())) && false ?: '_'};
         }));
     }
 
     public function getParameter($name)
     {
+        $name = (string) $name;
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             $name = $this->normalizeParameterName($name);
 
@@ -100,6 +101,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
     public function hasParameter($name)
     {
+        $name = (string) $name;
         $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
@@ -131,7 +133,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -155,7 +157,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         if (isset($this->normalizedParameterNames[$normalizedName = strtolower($name)]) || isset($this->parameters[$normalizedName]) || array_key_exists($normalizedName, $this->parameters)) {
             $normalizedName = isset($this->normalizedParameterNames[$normalizedName]) ? $this->normalizedParameterNames[$normalizedName] : $normalizedName;
             if ((string) $name !== $normalizedName) {
-                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since Symfony 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
             }
         } else {
             $normalizedName = $this->normalizedParameterNames[$normalizedName] = (string) $name;

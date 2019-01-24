@@ -1,32 +1,32 @@
 {% extends 'base.html.twig' %}
+
 {% block body %}
-    <h1>{{ 'list.product.title' | trans }}</h1>
+    <h1>Liste des produits</h1>
+
     <table class="table table-striped">
-        <thead class="thead-dark">
+        <thead class="thead-light">
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">{{ 'list.product.name' | trans }}</th>
-            <th scope="col">{{ 'list.product.price' | trans }}</th>
-            <th scope="col">{{ 'list.product.active' | trans }}</th>
-            <th scope="col">{{ 'list.product.created_at' | trans }}</th>
-            <th scope="col">{{ 'list.product.actions' | trans }}</th>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Active</th>
+            <th>Price</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
         {% for product in products %}
-        <tr>
-            <th scope="row">{{ product.id }}</th>
-            <td>{{ product.name }}</td>
-            <td>{{ product.price | number_format(2, '.', ' ') }}€</td>
-            <td>{{ product.active ? "Oui" : "Non" }}</td>
-            <td>{{ product.createdAt | date("d/m/Y") }}</td>
-            <td>
-                <a href="{{ path('cart_product_view', {id: product.id}) }}" class="btn btn-primary btn-sm"><i class="far fa-eye"></i></a>
-                <a href="{{ path('cart_product_edit', {id: product.id}) }}" class="btn btn-dark btn-sm"><i class="fas fa-pen"></i></a>
-                <a href="{{ path('cart_product_delete', {id: product.id}) }}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
-            </td>
-        </tr>
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.active ? 'Oui' : 'Non' }}</td>
+                <td>{{ product.price | number_format(2, ',', ' ') }}€</td>
+                <td>
+                    <a href="{{ path('cart_product_edit', { id: product.id }) }}" class="btn btn-outline-primary btn-sm">Editer</a>
+                    <a href="{{ path('cart_product_delete', { id: product.id }) }}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+                </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

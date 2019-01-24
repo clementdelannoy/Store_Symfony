@@ -1,6 +1,13 @@
 Symfony Standard Edition
 ========================
 
+# Install FOSUserBundle
+
+
+```bash
+php -d memory_limit=2G /usr/local/bin/composer require friendsofsymfony/user-bundle "~2.0"
+```
+
 Welcome to the Symfony Standard Edition - a fully-functional Symfony
 application that you can use as the skeleton for your new applications.
 

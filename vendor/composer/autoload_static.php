@@ -4,10 +4,11 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
+class ComposerStaticInitddf5cead8c0b2c47a618d9fe60e4bf80
 {
     public static $files = array (
         '92c8763cd6170fce6fcfe7e26b4e8c10' => __DIR__ . '/..' . '/symfony/phpunit-bridge/bootstrap.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '32dcc8afd4335739640db7d200c1971d' => __DIR__ . '/..' . '/symfony/polyfill-apcu/bootstrap.php',
@@ -19,6 +20,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
     );
 
     public static $prefixLengthsPsr4 = array (
+        'U' => 
+        array (
+            'UserBundle\\' => 11,
+        ),
         'T' => 
         array (
             'Twig\\' => 5,
@@ -30,6 +35,7 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
             'Symfony\\Polyfill\\Php70\\' => 23,
             'Symfony\\Polyfill\\Php56\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Polyfill\\Apcu\\' => 22,
             'Symfony\\Component\\' => 18,
             'Symfony\\Bundle\\SwiftmailerBundle\\' => 33,
@@ -43,6 +49,7 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
             'Sensio\\Bundle\\GeneratorBundle\\' => 30,
             'Sensio\\Bundle\\FrameworkExtraBundle\\' => 35,
             'Sensio\\Bundle\\DistributionBundle\\' => 33,
+            'SensioLabs\\Security\\' => 20,
         ),
         'P' => 
         array (
@@ -63,6 +70,7 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
         'F' => 
         array (
             'Fig\\Link\\' => 9,
+            'FOS\\UserBundle\\' => 15,
         ),
         'D' => 
         array (
@@ -84,6 +92,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
     );
 
     public static $prefixDirsPsr4 = array (
+        'UserBundle\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/UserBundle',
+        ),
         'Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/twig/twig/src',
@@ -107,6 +119,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Ctype\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
         'Symfony\\Polyfill\\Apcu\\' => 
         array (
@@ -160,6 +176,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
         array (
             0 => __DIR__ . '/..' . '/sensio/distribution-bundle',
         ),
+        'SensioLabs\\Security\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sensiolabs/security-checker/SensioLabs/Security',
+        ),
         'Psr\\SimpleCache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
@@ -191,6 +211,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
         'Fig\\Link\\' => 
         array (
             0 => __DIR__ . '/..' . '/fig/link-util/src',
+        ),
+        'FOS\\UserBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/friendsofsymfony/user-bundle',
         ),
         'Doctrine\\Instantiator\\' => 
         array (
@@ -232,13 +256,6 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
             'Twig_' => 
             array (
                 0 => __DIR__ . '/..' . '/twig/twig/lib',
-            ),
-        ),
-        'S' => 
-        array (
-            'SensioLabs\\Security' => 
-            array (
-                0 => __DIR__ . '/..' . '/sensiolabs/security-checker',
             ),
         ),
         'D' => 
@@ -290,10 +307,10 @@ class ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit7a8841e8792ea3c8ee431ea1a47f5764::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitddf5cead8c0b2c47a618d9fe60e4bf80::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitddf5cead8c0b2c47a618d9fe60e4bf80::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitddf5cead8c0b2c47a618d9fe60e4bf80::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitddf5cead8c0b2c47a618d9fe60e4bf80::$classMap;
 
         }, null, ClassLoader::class);
     }

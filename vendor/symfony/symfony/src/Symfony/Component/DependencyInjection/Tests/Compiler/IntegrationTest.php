@@ -14,9 +14,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * This class tests the integration of the different compiler passes.
@@ -117,13 +118,28 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
+    public function testCanDecorateServiceSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ServiceSubscriberStub::class)
+            ->addTag('container.service_subscriber')
+            ->setPublic(true);
+
+        $container->register(DecoratedServiceSubscriber::class)
+            ->setDecoratedService(ServiceSubscriberStub::class);
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+    }
+
     /**
      * @dataProvider getYamlCompileTests
      */
     public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
-        $container = $mainContainer ? $mainContainer : new ContainerBuilder();
+        $container = $mainContainer ?: new ContainerBuilder();
         $container->setResourceTracking(false);
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
         $loader->load('main.yml');
@@ -205,6 +221,18 @@ class IntegrationTest extends TestCase
             'child_service_expected',
         );
     }
+}
+
+class ServiceSubscriberStub implements ServiceSubscriberInterface
+{
+    public static function getSubscribedServices()
+    {
+        return array();
+    }
+}
+
+class DecoratedServiceSubscriber
+{
 }
 
 class IntegrationTestStub extends IntegrationTestStubParent

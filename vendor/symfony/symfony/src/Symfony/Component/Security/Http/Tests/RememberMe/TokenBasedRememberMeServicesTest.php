@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
 class TokenBasedRememberMeServicesTest extends TestCase
@@ -49,7 +49,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->will($this->throwException(new UsernameNotFoundException('user not found')))
+            ->willThrowException(new UsernameNotFoundException('user not found'))
         ;
 
         $this->assertNull($service->autoLogin($request));

@@ -2,10 +2,10 @@
 
 namespace CartBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use DateTime;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\JoinTable;
 
 /**
  * Product
@@ -67,9 +67,12 @@ class Product
     private $active;
 
     /**
-     * Many Products have Many Categories.
-     * @ManyToMany(targetEntity="Category", inversedBy="category")
-     * @JoinTable(name="products_categoies")
+     * Many Product have Many Categories.
+     *
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="CartBundle\Entity\Category", inversedBy="products")
+     * @ORM\JoinTable(name="products_categories")
      */
     private $categories;
 
@@ -84,7 +87,8 @@ class Product
         $this->setPrice(0);
         $this->setCreatedAt(new DateTime());
         $this->setUpdatedAt(new DateTime());
-        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
+
+        $this->setCategories(new ArrayCollection());
     }
 
     /**
@@ -242,28 +246,22 @@ class Product
     }
 
     /**
-     * @return mixed
+     * @param ArrayCollection $categories
+     * @return $this
+     */
+    public function setCategories(ArrayCollection $categories)
+    {
+        $this->categories = $categories;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
      */
     public function getCategories()
     {
         return $this->categories;
     }
-
-    /**
-     * @param mixed $categories
-     */
-    public function setCategories($categories)
-    {
-        $this->categories = $categories;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->name;
-    }
-
 }
 

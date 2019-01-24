@@ -12,15 +12,15 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
-use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
+use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
@@ -65,7 +65,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->will($this->throwException(new TokenNotFoundException('Token not found.')))
+            ->willThrowException(new TokenNotFoundException('Token not found.'))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -91,7 +91,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->will($this->throwException(new UsernameNotFoundException('user not found')))
+            ->willThrowException(new UsernameNotFoundException('user not found'))
         ;
 
         $this->assertNull($service->autoLogin($request));

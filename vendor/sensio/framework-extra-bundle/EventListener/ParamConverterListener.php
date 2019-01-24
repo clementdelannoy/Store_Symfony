@@ -54,17 +54,17 @@ class ParamConverterListener implements EventSubscriberInterface
     {
         $controller = $event->getController();
         $request = $event->getRequest();
-        $configurations = array();
+        $configurations = [];
 
         if ($configuration = $request->attributes->get('_converters')) {
-            foreach (is_array($configuration) ? $configuration : array($configuration) as $configuration) {
+            foreach (\is_array($configuration) ? $configuration : [$configuration] as $configuration) {
                 $configurations[$configuration->getName()] = $configuration;
             }
         }
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && is_callable($controller, '__invoke')) {
+        } elseif (\is_object($controller) && \is_callable([$controller, '__invoke'])) {
             $r = new \ReflectionMethod($controller, '__invoke');
         } else {
             $r = new \ReflectionFunction($controller);
@@ -91,7 +91,7 @@ class ParamConverterListener implements EventSubscriberInterface
 
             if ($class || $hasType) {
                 if (!isset($configurations[$name])) {
-                    $configuration = new ParamConverter(array());
+                    $configuration = new ParamConverter([]);
                     $configuration->setName($name);
 
                     $configurations[$name] = $configuration;
@@ -115,8 +115,8 @@ class ParamConverterListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             KernelEvents::CONTROLLER => 'onKernelController',
-        );
+        ];
     }
 }

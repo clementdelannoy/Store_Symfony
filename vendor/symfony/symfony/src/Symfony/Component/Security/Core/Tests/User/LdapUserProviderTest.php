@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * @requires extension ldap
@@ -33,7 +33,7 @@ class LdapUserProviderTest extends TestCase
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->will($this->throwException(new ConnectionException()))
+            ->willThrowException(new ConnectionException())
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');

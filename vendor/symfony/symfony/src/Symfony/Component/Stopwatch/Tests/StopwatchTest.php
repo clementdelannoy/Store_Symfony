@@ -35,6 +35,14 @@ class StopwatchTest extends TestCase
         $this->assertSame($event, $stopwatch->getEvent('foo'));
     }
 
+    public function testStartWithoutCategory()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatchEvent = $stopwatch->start('bar');
+        $this->assertSame('default', $stopwatchEvent->getCategory());
+        $this->assertSame($stopwatchEvent, $stopwatch->getEvent('bar'));
+    }
+
     public function testIsStarted()
     {
         $stopwatch = new Stopwatch();
@@ -79,7 +87,7 @@ class StopwatchTest extends TestCase
         $event = $stopwatch->stop('foo');
 
         $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+        $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
     }
 
     /**

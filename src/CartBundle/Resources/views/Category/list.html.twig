@@ -1,27 +1,30 @@
 {% extends 'base.html.twig' %}
+
 {% block body %}
-    <h1>{{ 'list.category.title' | trans }}</h1>
+    <h1>{{ 'Liste des catégories' | trans }}</h1>
+
     <table class="table table-striped">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">{{ 'list.category.name' | trans }}</th>
-            <th scope="col">{{ 'list.category.active' | trans }}</th>
-            <th scope="col">{{ 'list.category.actions' | trans }}</th>
-        </tr>
+        <thead class="thead-light">
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
-        {% for category in categories %}
-        <tr>
-            <th scope="row">{{ category.id }}</th>
-            <td>{{ category.name }}</td>
-            <td>{{ category.active ? "Oui" : "Non" }}</td>
-            <td>
-                <a href="{{ path('cart_category_edit', {id: category.id} ) }}" class="btn btn-dark btn-sm"><i class="fas fa-pen"></i></a>
-                <a href="{{ path('cart_category_delete', {id: category.id} ) }}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
-            </td>
-        </tr>
-        {% endfor %}
+            {% for category in categories %}
+            <tr>
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.active ? 'Oui' : 'Non' }}</td>
+                <td>
+                    <a href="{{ path('cart_category_edit', { id: category.id }) }}" class="btn btn-outline-primary btn-sm">Editer</a>
+                    <a href="{{ path('cart_category_delete', { id: category.id }) }}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

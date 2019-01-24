@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class UnusedTagsPass implements CompilerPassInterface
 {
     private $whitelist = array(
+        'annotations.cached_reader',
         'cache.pool.clearer',
         'console.command',
         'container.hot_path',
@@ -62,7 +63,7 @@ class UnusedTagsPass implements CompilerPassInterface
 
         foreach ($container->findUnusedTags() as $tag) {
             // skip whitelisted tags
-            if (in_array($tag, $this->whitelist)) {
+            if (\in_array($tag, $this->whitelist)) {
                 continue;
             }
 
@@ -73,7 +74,7 @@ class UnusedTagsPass implements CompilerPassInterface
                     continue;
                 }
 
-                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= strlen($tag) / 3) {
+                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= \strlen($tag) / 3) {
                     $candidates[] = $definedTag;
                 }
             }

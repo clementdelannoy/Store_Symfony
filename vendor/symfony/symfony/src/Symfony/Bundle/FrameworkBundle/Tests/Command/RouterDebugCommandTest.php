@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -49,7 +49,7 @@ class RouterDebugCommandTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct() expects an instance of "Symfony\Component\Routing\RouterInterface" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
+     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct() expects an instance of "Symfony\Component\Routing\RouterInterface" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
      */
     public function testLegacyDebugCommand()
     {

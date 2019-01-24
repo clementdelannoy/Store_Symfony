@@ -49,7 +49,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
     }
 
     public function testSubmitString()
@@ -133,7 +133,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
     }
 
     public function testSubmitWithSeconds()
@@ -165,7 +165,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
     public function testSubmitDifferentTimezones()
@@ -211,12 +211,12 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
 
-        $form->submit('2010-06-02T03:04:00-10:00');
+        $form->submit('2010-06-02T03:04:00');
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
+        $this->assertEquals($outputTime, $form->getData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmitStringSingleText()
@@ -228,10 +228,10 @@ class DateTimeTypeTest extends BaseTypeTest
             'widget' => 'single_text',
         ));
 
-        $form->submit('2010-06-02T03:04:00Z');
+        $form->submit('2010-06-02T03:04:00');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00Z', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmitStringSingleTextWithSeconds()
@@ -244,10 +244,10 @@ class DateTimeTypeTest extends BaseTypeTest
             'with_seconds' => true,
         ));
 
-        $form->submit('2010-06-02T03:04:05Z');
+        $form->submit('2010-06-02T03:04:05');
 
         $this->assertEquals('2010-06-02 03:04:05', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:05', $form->getViewData());
     }
 
     public function testSubmitDifferentPattern()
@@ -266,7 +266,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'time' => '03:04',
         ));
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
     }
 
     public function testInitializeWithDateTime()
@@ -283,7 +283,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertEquals('datetime', $view->vars['type']);
+        $this->assertEquals('datetime-local', $view->vars['type']);
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
@@ -408,7 +408,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertSame('datetime', $view->vars['type']);
+        $this->assertSame('datetime-local', $view->vars['type']);
     }
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()
@@ -419,7 +419,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
@@ -430,7 +430,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -440,7 +440,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDateTypeChoiceErrorsBubbleUp()
@@ -579,5 +579,48 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertNull($form->getData());
         $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(
+            array('date' => array('year' => '', 'month' => '', 'day' => ''), 'time' => array('hour' => '', 'minute' => '')),
+            $form->getViewData()
+        );
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ));
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '2018-11-11 21:23');
+
+        return array(
+            'Simple field' => array('single_text', '2018-11-11T21:23:00', $expectedData),
+            'Compound text field' => array('text', array('date' => array('year' => '2018', 'month' => '11', 'day' => '11'), 'time' => array('hour' => '21', 'minute' => '23')), $expectedData),
+            'Compound choice field' => array('choice', array('date' => array('year' => '2018', 'month' => '11', 'day' => '11'), 'time' => array('hour' => '21', 'minute' => '23')), $expectedData),
+        );
     }
 }

@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class SimpleFormTest_Countable implements \Countable
 {
@@ -629,7 +629,7 @@ class SimpleFormTest extends AbstractFormTest
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
             ->method('reverseTransform')
-            ->will($this->throwException(new TransformationFailedException()));
+            ->willThrowException(new TransformationFailedException());
 
         $form = $this->getBuilder()
             ->addViewTransformer($transformer)
@@ -645,7 +645,7 @@ class SimpleFormTest extends AbstractFormTest
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
             ->method('reverseTransform')
-            ->will($this->throwException(new TransformationFailedException()));
+            ->willThrowException(new TransformationFailedException());
 
         $form = $this->getBuilder()
             ->addModelTransformer($transformer)

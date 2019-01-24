@@ -15,12 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
@@ -185,7 +185,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
-            ->will($this->throwException($authException));
+            ->willThrowException($authException);
 
         // this is not called
         $this->authenticationManager
@@ -391,7 +391,7 @@ class GuardAuthenticationListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Returning null from "%s::getCredentials()" is deprecated since version 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%s::supports()" instead.
+     * @expectedDeprecation Returning null from "%s::getCredentials()" is deprecated since Symfony 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%s::supports()" instead.
      */
     public function testReturnNullFromGetCredentialsTriggersForAbstractGuardAuthenticatorInstances()
     {

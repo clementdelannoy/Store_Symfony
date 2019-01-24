@@ -41,6 +41,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
+            'foo3' => true,
         );
     }
 
@@ -56,7 +57,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     public function isFrozen()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
     }
@@ -106,7 +107,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : $this->services['foo3'] = new \stdClass()) && false ?: '_'};
+        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : ($this->services['foo3'] = new \stdClass())) && false ?: '_'};
 
         return $instance;
     }
